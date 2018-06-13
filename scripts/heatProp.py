@@ -1,5 +1,6 @@
 import argparse
 import sys
+import numpy as np
 
 def parseargs(arguments):
     parser = argparse.ArgumentParser(description="Check help flag")
@@ -54,12 +55,20 @@ def output(heatRanks, output):
             heat = tup[1]
             fileout.write("%s\t%s" % (gene, heat))
 
+def maxheats(masterheatRanks, output):
+    return finalheats
+
 def main():
     args = parseargs(sys.argv[1:])
     adjMatrix = readNetwork(args.network)
     heat = readGWAS(args.gwas)
-    heatranks = heatProp(adjMatrix, heat, args.uppertimebound)
-    output(heatranks, args.output)
+    timeVals = np.linspace(0, args.uppertimebound, 10)
+    masterheatranks = []
+    for t in timeVals:
+        heatranks = heatProp(adjMatrix, heat, t)
+        masterheatranks.append(heatranks)
+    finalheats = maxheats(masterheatranks)
+    output(finalheats, args.output)
 
 if __name__=="__main__":
 	main()
