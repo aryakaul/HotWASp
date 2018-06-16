@@ -69,7 +69,7 @@ def readNetwork(networkPath, header = True,sep = "\t"):
     mat = np.array(mat)
     return mat,geneList
     
-def readGWAS(gwasPath geneList, geneCol =0, pvalCol = 1, sep = "\t", header = True)):
+def readGWAS(gwasPath, geneList, geneCol =0, pvalCol = 1, sep = "\t", header = True):
 
     pvalDict = {}
     with open(gwasPath) as data:
@@ -86,11 +86,12 @@ def readGWAS(gwasPath geneList, geneCol =0, pvalCol = 1, sep = "\t", header = Tr
         if i not in pvalDict:
             heats.append(0)
         else:
-            heats.append(-math.log(pvalDict[i],1.5))
-        heatTups.append((heats[i],geneList[i])
+            #heats.append(-math.log(pvalDict[i],1.5))
+            heats.append(1/pvalDict[i])
+        heatTups.append((heats[-1],i))
     
     heatTups.sort(reverse =True)
-    top25 = [x[1] for x in heatTups[:25]
+    top25 = [x[1] for x in heatTups[:25]]
     
     return heats,top25
 
@@ -151,6 +152,7 @@ def output(heat,geneList,top25, output):
         
 def maxheats(masterheatRanks):
 
+    maxList = []
     for h in masterheatRanks:
             #curr = [x.strip() for x in open(f).readlines()]
             if len(maxList) ==0:
@@ -158,13 +160,13 @@ def maxheats(masterheatRanks):
                     maxList.append([i])
             else:
                 for i in range(len(h)):
-                    maxList[i].append(curr[i])
+                    maxList[i].append(h[i])
                     
     finalheats = []
     for x in maxList:
         finalheats.append(max(x))
     return finalheats
-def getTimes (maxT):
+def getTimes (maxT=.5):
 
     times = [.01,.1,.25,.5,.75,1,3,5,10,.001,.0001]
     priorityTups = [(5,0),(1,1),(8,2),(6,3),(9,4),(2,5),(7,6),(3,7),(4,8),(10,9),(11,10)]
